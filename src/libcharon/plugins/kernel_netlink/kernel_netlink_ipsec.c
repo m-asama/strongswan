@@ -633,6 +633,9 @@ struct policy_entry_t {
 
 	/** TRUE if a thread is working on this policy */
 	bool working;
+
+	/** TRUE if install route required */
+	bool install_route;
 };
 
 /**
@@ -2849,7 +2852,7 @@ static status_t add_policy_internal(private_kernel_netlink_ipsec_t *this,
 	 * - no XFRM interface ID is configured
 	 * - we are in tunnel/BEET mode or install a bypass policy
 	 */
-	if (policy->direction == POLICY_OUT && this->install_routes &&
+	if (policy->direction == POLICY_OUT && this->install_routes && policy->install_route &&
 		!policy->sel.proto && !policy->sel.dport && !policy->sel.sport &&
 		!policy->if_id)
 	{
@@ -2882,6 +2885,7 @@ METHOD(kernel_ipsec_t, add_policy, status_t,
 		.if_id = id->if_id,
 		.direction = id->dir,
 		.reqid = data->sa->reqid,
+		.install_route = data->install_route,
 	);
 	format_mark(markstr, sizeof(markstr), id->mark);
 
